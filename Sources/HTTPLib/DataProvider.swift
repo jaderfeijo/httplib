@@ -39,7 +39,12 @@ public protocol DataProvider {
 }
 
 public extension DataProvider {
+
 	@available(macOS 10.15, *)
+	/// Sends the specified request to the provider.
+	/// - Parameter request: The request used to send/retrieve the data
+	///   from the provider.
+	/// - Returns:The data provider's response.
 	func send(_ request: DataProviderRequest) async throws -> DataProviderResponse {
 		try await withCheckedThrowingContinuation { continuation in
 			do {
