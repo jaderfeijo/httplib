@@ -12,76 +12,84 @@ public class HTTPDataProvider: DataProvider {
 		self.session = session
 	}
 
-	public func send(_ request: DataProviderRequest, callback: @escaping DataProviderClosure) {
-		if let httpRequest = URLRequest.with(request: request) {
-			print("HTTP: \(httpRequest.httpMethod ?? "nil") \(httpRequest.url?.absoluteString ?? "nil")")
-			if let body = request.body {
-				print(String(data: body as Data, encoding: String.Encoding.utf8) ?? "")
-				session.uploadTask(with: httpRequest, from: body as Data, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) in
-					if error != nil {
-						print("Server unreachable")
-						callback(.unreachable)
-					} else if let httpResponse = (response as? HTTPURLResponse) {
-						print("\(httpResponse.statusCode)")
-						if let data = data {
-							print(String(data: data, encoding: String.Encoding.utf8) ?? "")
-						}
-						
-						if let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) {
-							if statusCode.isSuccess {
-								callback(.success(data: data))
-							} else {
-								callback(.error(code: statusCode, data: data))
-							}
-						} else {
-							callback(.error(code: nil, data: data))
-						}
-					} else {
-						callback(.error(code: nil, data: data))
-					}
-					print("")
-				}).resume()
-			} else {
-				session.dataTask(with: httpRequest, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) in
-					if error != nil {
-						print("Server unreachable")
-						callback(.unreachable)
-					} else if let httpResponse = (response as? HTTPURLResponse) {
-						print("\(httpResponse.statusCode)")
-						if let data = data {
-							print(String(data: data, encoding: String.Encoding.utf8) ?? "")
-						}
-						
-						if let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) {
-							if statusCode.isSuccess {
-								callback(.success(data: data))
-							} else {
-								callback(.error(code: statusCode, data: data))
-							}
-						} else {
-							callback(.error(code: nil, data: data))
-						}
-					} else {
-						callback(.error(code: nil, data: data))
-					}
-					print("")
-				}).resume()
-			}
+	public func send(_ request: DataProviderRequest, callback: @escaping DataProviderClosure) throws {
+		let httpRequest = try URLRequest.from(
+			request: request)
+
+		if let body = request.body {
+			upload(
+				httpRequest,
+				body: body,
+				callback: callback)
 		} else {
-			callback(.error(code: nil, data: nil))
+			download(
+				httpRequest,
+				callback: callback)
 		}
 	}
 }
 
-extension URLRequest {
-	public static func with(request: DataProviderRequest) -> URLRequest? {
-		if let url = URL(string: request.url) {
-			let urlRequest = NSMutableURLRequest(url: url)
-			urlRequest.httpMethod = request.method.rawValue
-			urlRequest.allHTTPHeaderFields = request.headers
-			return urlRequest as URLRequest
-		} else {
-			return nil
+// MARK: - Private -
+
+private extension HTTPDataProvider {
+	func upload(_ request: URLRequest, body: Data, callback: @escaping DataProviderClosure) {
+		session.uploadTask(with: request, from: body) {
+			callback(
+				.from(
+					data: $0,
+					response: $1,
+					error: $2)
+			)
+		}.resume()
+	}
+
+	func download(_ request: URLRequest, callback: @escaping DataProviderClosure) {
+		session.dataTask(with: request) {
+			callback(
+				.from(
+					data: $0,
+					response: $1,
+					error: $2)
+			)
+		}.resume()
+	}
+}
+
+private extension DataProviderResponse {
+	static func from(data: Data?, response: URLResponse?, error: Error?) -> Self {
+		guard error == nil else {
+			return .unreachable
 		}
+
+		guard let httpResponse = (response as? HTTPURLResponse) else {
+			return .error(code: nil, data: data)
+		}
+
+		guard let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) else {
+			return .error(code: nil, data: data)
+		}
+
+		guard statusCode.isSuccess else {
+			return .error(code: statusCode, data: data)
+		}
+
+		return .success(data: data)
+	}
+}
+
+private extension URLRequest {
+	static func from(request: DataProviderRequest) throws -> URLRequest {
+		struct InvalidURLError: Swift.Error {
+			let url: String
+		}
+
+		guard let url = URL(string: request.url) else {
+			throw InvalidURLError(url: request.url)
+		}
+
+		let urlRequest = NSMutableURLRequest(url: url)
+		urlRequest.httpMethod = request.method.rawValue
+		urlRequest.allHTTPHeaderFields = request.headers
+		return urlRequest as URLRequest
 	}
 }

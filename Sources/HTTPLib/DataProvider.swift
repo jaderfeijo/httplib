@@ -35,7 +35,22 @@ public protocol DataProvider {
 	///   from the provider.
 	/// - parameter callback: The callback called once the request completes
 	///   executing the request.
-	func send(_ request: DataProviderRequest, callback: @escaping DataProviderClosure)
+	func send(_ request: DataProviderRequest, callback: @escaping DataProviderClosure) throws
+}
+
+public extension DataProvider {
+	@available(macOS 10.15, *)
+	func send(_ request: DataProviderRequest) async throws -> DataProviderResponse {
+		try await withCheckedThrowingContinuation { continuation in
+			do {
+				try send(request) { response in
+					continuation.resume(returning: response)
+				}
+			} catch {
+				continuation.resume(throwing: error)
+			}
+		}
+	}
 }
 
 public enum HTTPMethod: String {
