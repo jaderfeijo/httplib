@@ -13,7 +13,7 @@ let package = Package(
 		.package(
 			name: "HTTPStatusCodes",
 			url: "https://github.com/rhodgkins/SwiftHTTPStatusCodes.git",
-			.upToNextMajor(from: "3.0.0"))
+			.upToNextMajor(from: "3.3.0"))
 	],
 	targets: [
 		.target(

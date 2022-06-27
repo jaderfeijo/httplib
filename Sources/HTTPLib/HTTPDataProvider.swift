@@ -6,12 +6,10 @@ import HTTPStatusCodes
 /// This class provides data via HTTP to it's consumers.
 public class HTTPDataProvider: DataProvider {
 
-	private var session: URLSession
+	private let session: URLSession
 
-	public init() {
-		let sessionConfiguration = URLSessionConfiguration.default
-		sessionConfiguration.requestCachePolicy = .useProtocolCachePolicy
-		session = URLSession(configuration: sessionConfiguration)
+	public init(session: URLSession = .shared) {
+		self.session = session
 	}
 
 	public func send(_ request: DataProviderRequest, callback: @escaping DataProviderClosure) {
@@ -28,7 +26,7 @@ public class HTTPDataProvider: DataProvider {
 						if let data = data {
 							print(String(data: data, encoding: String.Encoding.utf8) ?? "")
 						}
-
+						
 						if let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) {
 							if statusCode.isSuccess {
 								callback(.success(data: data))
@@ -53,7 +51,7 @@ public class HTTPDataProvider: DataProvider {
 						if let data = data {
 							print(String(data: data, encoding: String.Encoding.utf8) ?? "")
 						}
-
+						
 						if let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) {
 							if statusCode.isSuccess {
 								callback(.success(data: data))
