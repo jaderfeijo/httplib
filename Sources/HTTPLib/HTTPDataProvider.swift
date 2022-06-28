@@ -1,6 +1,10 @@
 import Foundation
 import HTTPStatusCodes
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 /// HTTP Data Provider.
 ///
 /// This class provides data via HTTP to it's consumers.

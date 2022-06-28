@@ -1,6 +1,10 @@
 import Foundation
 import HTTPStatusCodes
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 public typealias DataProviderClosure = (DataProviderResponse) -> Void
 
 public struct DataProviderRequest {

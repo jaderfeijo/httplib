@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "HTTPStatusCodes",
-        "repositoryURL": "https://github.com/rhodgkins/SwiftHTTPStatusCodes.git",
+        "repositoryURL": "https://github.com/jaderfeijo/SwiftHTTPStatusCodes.git",
         "state": {
-          "branch": null,
-          "revision": "a2c4f5f645dec3a5614ff82e391f44e22d778f87",
-          "version": "3.3.2"
+          "branch": "master",
+          "revision": "03e37747e84f2cd9d291a1681b6ddcf416281710",
+          "version": null
         }
       }
     ]
