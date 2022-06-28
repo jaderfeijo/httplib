@@ -37,30 +37,30 @@ public class HTTPDataProvider: DataProvider {
 
 private extension HTTPDataProvider {
 	func upload(_ request: URLRequest, body: Data, callback: @escaping DataProviderClosure) {
-		session.uploadTask(with: request, from: body) {
+		session.uploadTask(with: request, from: body) { data, response, error in
 			callback(
-				.from(
-					data: $0,
-					response: $1,
-					error: $2)
+				.mappedResponse(
+					from: data,
+					response: response,
+					error: error)
 			)
 		}.resume()
 	}
 
 	func download(_ request: URLRequest, callback: @escaping DataProviderClosure) {
-		session.dataTask(with: request) {
+		session.dataTask(with: request) { data, response, error in
 			callback(
-				.from(
-					data: $0,
-					response: $1,
-					error: $2)
+				.mappedResponse(
+					from: data,
+					response: response,
+					error: error)
 			)
 		}.resume()
 	}
 }
 
 private extension DataProviderResponse {
-	static func from(data: Data?, response: URLResponse?, error: Error?) -> Self {
+	static func mappedResponse(from data: Data?, response: URLResponse?, error: Error?) -> Self {
 		guard error == nil else {
 			return .unreachable
 		}
