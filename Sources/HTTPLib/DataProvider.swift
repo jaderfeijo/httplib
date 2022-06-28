@@ -5,8 +5,10 @@ import HTTPStatusCodes
 import FoundationNetworking
 #endif
 
+/// A closure that passes a response to a sent request.
 public typealias DataProviderClosure = (DataProviderResponse) -> Void
 
+/// A request sent to a `DataProvider`
 public struct DataProviderRequest {
 	public let method: HTTPMethod
 	public let url: String
@@ -32,7 +34,6 @@ public enum DataProviderResponse {
 ///
 /// @since 1.0
 public protocol DataProvider {
-
 	/// Sends the specified request to the provider.
 	///
 	/// - parameter request: The request used to send/retrieve the data
@@ -43,7 +44,6 @@ public protocol DataProvider {
 }
 
 public extension DataProvider {
-
 	@available(macOS 10.15, *)
 	/// Sends the specified request to the provider.
 	/// - Parameter request: The request used to send/retrieve the data
@@ -62,6 +62,7 @@ public extension DataProvider {
 	}
 }
 
+/// The HTTP method to use for a given request.
 public enum HTTPMethod: String {
 	case get = "GET"
 	case head = "HEAD"
