@@ -1,6 +1,10 @@
 import XCTest
 @testable import HTTPLib
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 class HTTPDataProviderTests: XCTestCase {
 	var configuration: URLSessionConfiguration!
 	var session: URLSession!
