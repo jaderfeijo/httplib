@@ -2,13 +2,77 @@ import XCTest
 @testable import HTTPLib
 
 class DataProviderTests: XCTestCase {
+	var mockProvider: MockDataProvider!
 
-	static var allTests = [
-		("testDataProviderRequestEquality", testDataProviderRequestEquality),
-		("testDataProviderResponseEquality", testDataProviderResponseEquality)
-	]
+	override func setUpWithError() throws {
+		try super.setUpWithError()
+		mockProvider = MockDataProvider()
+		mockProvider.getResponse = { _ in .unreachable }
+	}
 
-	func testDataProviderRequestEquality() {
+	override func tearDownWithError() throws {
+		mockProvider = nil
+		try super.tearDownWithError()
+	}
+}
+
+extension DataProviderTests {
+	func testSendAsyncSuccess() async throws {
+		mockProvider.getResponse = { _ in
+			.success(data: nil)
+		}
+
+		let response = try await mockProvider.send(
+			.init(
+				method: .get,
+				url: "http://test/test",
+				headers: nil,
+				body: nil)
+		)
+
+		XCTAssertEqual(response, .success(data: nil))
+	}
+
+	func testSendAsyncFailure() async throws {
+		mockProvider.getResponse = { _ in
+			.error(code: .internalServerError, data: nil)
+		}
+
+		let response = try await mockProvider.send(
+			.init(
+				method: .get,
+				url: "http://test/test",
+				headers: nil,
+				body: nil)
+		)
+
+		XCTAssertEqual(response, .error(code: .internalServerError, data: nil))
+	}
+
+	func testSendAsyncException() async throws {
+		struct MockError: Swift.Error {}
+
+		mockProvider.getResponse = { _ in
+			throw MockError()
+		}
+
+		do {
+			_ = try await mockProvider.send(
+				.init(
+					method: .get,
+					url: "http://test/test",
+					headers: nil,
+					body: nil)
+			)
+			XCTFail("Expected exception to be thrown")
+		} catch {
+			XCTAssert(error is MockError)
+		}
+	}
+}
+
+extension DataProviderTests {
+	func testDataProviderRequestEquality() throws {
 		let firstRequest = DataProviderRequest(
 			method: .get,
 			url: "test",
@@ -33,7 +97,7 @@ class DataProviderTests: XCTestCase {
 		XCTAssertNotEqual(secondRequest, thirdRequest)
 	}
 	
-	func testDataProviderResponseEquality() {
+	func testDataProviderResponseEquality() throws {
 		XCTAssertEqual(
 			DataProviderResponse.success(data: "test".data(using: .utf8)),
 			DataProviderResponse.success(data: "test".data(using: .utf8))
@@ -89,5 +153,19 @@ class DataProviderTests: XCTestCase {
 			DataProviderResponse.error(code: nil, data: nil),
 			DataProviderResponse.unreachable
 		)
+	}
+}
+
+// MARK: - Private -
+
+extension DataProviderTests {
+	class MockDataProvider: DataProvider {
+		typealias ResponseProvider = (DataProviderRequest) throws -> DataProviderResponse
+
+		var getResponse: ResponseProvider!
+
+		func send(_ request: DataProviderRequest, callback: @escaping DataProviderClosure) throws {
+			callback(try getResponse(request))
+		}
 	}
 }
