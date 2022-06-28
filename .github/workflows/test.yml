@@ -1,0 +1,24 @@
+name: Run Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: '5.5'
+      - name: Swift Version
+        run: swift --version
+      - name: Build
+        run: swift build
+      - name: Run tests
+        run: swift test
