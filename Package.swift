@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 
 import PackageDescription
 
@@ -7,19 +7,22 @@ let package = Package(
 	products: [
 		.library(
 			name: "HTTPLib",
-			targets: ["HTTPLib"]),
+			targets: ["HTTPLib"])
 	],
 	dependencies: [
 		.package(
-			name: "HTTPStatusCodes",
 			url: "https://github.com/jaderfeijo/SwiftHTTPStatusCodes.git",
-			.branch("master")
-		)
+			revision: "03e37747e84f2cd9d291a1681b6ddcf416281710")
 	],
 	targets: [
 		.target(
 			name: "HTTPLib",
-			dependencies: ["HTTPStatusCodes"]),
+			dependencies: [
+				.product(
+					name: "HTTPStatusCodes",
+					package: "SwiftHTTPStatusCodes")
+			]
+		),
 		.testTarget(
 			name: "HTTPLibTests",
 			dependencies: ["HTTPLib"]),
