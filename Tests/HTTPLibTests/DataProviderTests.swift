@@ -17,6 +17,7 @@ class DataProviderTests: XCTestCase {
 }
 
 extension DataProviderTests {
+	@available(macOS 10.15, iOS 13.0.0, *)
 	func testSendAsyncSuccess() async throws {
 		mockProvider.getResponse = { _ in
 			.success(data: nil)
@@ -33,6 +34,7 @@ extension DataProviderTests {
 		XCTAssertEqual(response, .success(data: nil))
 	}
 
+	@available(macOS 10.15, iOS 13.0.0, *)
 	func testSendAsyncFailure() async throws {
 		mockProvider.getResponse = { _ in
 			.error(code: .internalServerError, data: nil)
@@ -49,6 +51,7 @@ extension DataProviderTests {
 		XCTAssertEqual(response, .error(code: .internalServerError, data: nil))
 	}
 
+	@available(macOS 10.15, iOS 13.0.0, *)
 	func testSendAsyncException() async throws {
 		struct MockError: Swift.Error {}
 
