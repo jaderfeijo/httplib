@@ -51,6 +51,19 @@ extension HTTPDataProviderTests {
 	}
 
 	func testSendPostRequest() throws {
+		#if os(watchOS)
+		/*
+		 Due to what appears to be a bug in watchOS, this test does not run
+		 correctly on watchOS and is therefore disabled on that platform.
+
+		 It seems that, when using the `URLSession.uploadTask` method, the
+		 `MockURLProtocol` injected into the `URLSessionConfiguration` is ignored,
+		 which causes the code to actually hit the specified URL, bypassing the custom
+		 protocol.
+		*/
+		return
+		#endif
+
 		let expectation = expectation(description: "request completed")
 
 		MockURLProtocol.requestHandler = { request in

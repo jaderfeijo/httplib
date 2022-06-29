@@ -44,7 +44,7 @@ public protocol DataProvider {
 }
 
 public extension DataProvider {
-	@available(macOS 10.15, iOS 13.0.0, *)
+	@available(macOS 10.15, iOS 13.0.0, tvOS 13.0.0, watchOS 6.0, *)
 	/// Sends the specified request to the provider.
 	/// - Parameter request: The request used to send/retrieve the data
 	///   from the provider.
