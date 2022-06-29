@@ -18,7 +18,7 @@ let package = Package(
 	dependencies: [
 		.package(
 			url: "https://github.com/jaderfeijo/SwiftHTTPStatusCodes.git",
-			revision: "03e37747e84f2cd9d291a1681b6ddcf416281710")
+			.upToNextMajor(from: "3.4.0"))
 	],
 	targets: [
 		.target(

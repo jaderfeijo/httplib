@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/jaderfeijo/SwiftHTTPStatusCodes.git",
         "state": {
           "branch": null,
-          "revision": "03e37747e84f2cd9d291a1681b6ddcf416281710",
-          "version": null
+          "revision": "8f5e0b8002820fadbabcce5523ebec46ccfe711b",
+          "version": "3.4.0"
         }
       }
     ]
