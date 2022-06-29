@@ -5,7 +5,7 @@
         "package": "HTTPStatusCodes",
         "repositoryURL": "https://github.com/jaderfeijo/SwiftHTTPStatusCodes.git",
         "state": {
-          "branch": "master",
+          "branch": null,
           "revision": "03e37747e84f2cd9d291a1681b6ddcf416281710",
           "version": null
         }
