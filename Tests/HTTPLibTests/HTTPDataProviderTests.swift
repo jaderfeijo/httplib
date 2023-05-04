@@ -35,7 +35,7 @@ extension HTTPDataProviderTests {
 		let expectation = expectation(description: "request completed")
 
 		do {
-			let request = SimpleDataProviderRequest(
+			let request = RawDataProviderRequest(
 				method: .get,
 				url: "   ",
 				headers: [:],
@@ -78,7 +78,7 @@ extension HTTPDataProviderTests {
 			)
 		}
 
-		let request = SimpleDataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .post,
 			url: "test",
 			headers: [:],
@@ -105,7 +105,7 @@ extension HTTPDataProviderTests {
 			)
 		}
 
-		let request = SimpleDataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .get,
 			url: "test",
 			headers: [:],
@@ -125,7 +125,7 @@ extension HTTPDataProviderTests {
 			throw URLError(URLError.timedOut)
 		}
 
-		let request = SimpleDataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .get,
 			url: "test",
 			headers: [:],
@@ -216,7 +216,7 @@ extension HTTPDataProviderTests {
 
 extension HTTPDataProviderTests {
 	func testURLRequestFromDataProviderRequestSuccess() throws {
-		let request = SimpleDataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .get,
 			url: "http://test/test",
 			headers: ["key": "value"],
@@ -231,7 +231,7 @@ extension HTTPDataProviderTests {
 	}
 
 	func testURLRequestFromDataProviderRequestInvalidURL() throws {
-		let request = SimpleDataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .get,
 			url: "   ", // invalid url
 			headers: ["key": "value"],

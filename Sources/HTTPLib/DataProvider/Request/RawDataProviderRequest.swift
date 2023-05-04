@@ -2,9 +2,10 @@ import Foundation
 import HTTPMethod
 
 /**
- A simple implementation of a data provider request.
+ A simple implementation of a data provider request which takes
+ raw data to send to a server over HTTP.
  */
-public struct SimpleDataProviderRequest: DataProviderRequest {
+public struct RawDataProviderRequest: DataProviderRequest {
 	public let method: HTTPMethod
 	public let url: String
 	public let headers: [String: String]

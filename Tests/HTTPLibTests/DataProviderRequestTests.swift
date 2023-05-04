@@ -3,19 +3,19 @@ import XCTest
 
 final class DataProviderRequestTests: XCTestCase {
 	func testDataProviderRequestEquality() throws {
-		let firstRequest = SimpleDataProviderRequest(
+		let firstRequest = RawDataProviderRequest(
 			method: .get,
 			url: "test",
 			headers: ["test":"value"],
 			body: "test".data(using: .utf8)
 		)
-		let secondRequest = SimpleDataProviderRequest(
+		let secondRequest = RawDataProviderRequest(
 			method: .get,
 			url: "test",
 			headers: ["test":"value"],
 			body: "test".data(using: .utf8)
 		)
-		let thirdRequest = SimpleDataProviderRequest(
+		let thirdRequest = RawDataProviderRequest(
 			method: .post,
 			url: "another-test",
 			headers: ["another-test":"another-value"],
