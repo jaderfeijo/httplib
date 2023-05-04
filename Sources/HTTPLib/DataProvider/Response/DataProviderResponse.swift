@@ -28,3 +28,23 @@ extension DataProviderResponse: Equatable {
 		}
 	}
 }
+
+// MARK: - Internal -
+
+extension DataProviderResponse {
+	init(from data: Data?, response: URLResponse?, error: Error?) {
+		guard error == nil else {
+			self = .unreachable; return
+		}
+		guard let httpResponse = (response as? HTTPURLResponse) else {
+			self = .error(code: nil, data: data); return
+		}
+		guard let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) else {
+			self = .error(code: nil, data: data); return
+		}
+		guard statusCode.isSuccess else {
+			self = .error(code: statusCode, data: data); return
+		}
+		self = .success(data: data)
+	}
+}

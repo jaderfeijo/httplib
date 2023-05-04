@@ -36,28 +36,6 @@ extension HTTPDataProvider: DataProvider {
 
 // MARK: - Internal -
 
-extension DataProviderResponse {
-	static func mappedResponse(from data: Data?, response: URLResponse?, error: Error?) -> Self {
-		guard error == nil else {
-			return .unreachable
-		}
-
-		guard let httpResponse = (response as? HTTPURLResponse) else {
-			return .error(code: nil, data: data)
-		}
-
-		guard let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) else {
-			return .error(code: nil, data: data)
-		}
-
-		guard statusCode.isSuccess else {
-			return .error(code: statusCode, data: data)
-		}
-
-		return .success(data: data)
-	}
-}
-
 extension URLRequest {
 	struct InvalidURLError: Swift.Error {
 		let url: String
@@ -82,7 +60,7 @@ private extension HTTPDataProvider {
 	func upload(_ request: URLRequest, body: Data, callback respondWith: @escaping DataProviderClosure) {
 		session.uploadTask(with: request, from: body) { data, response, error in
 			respondWith(
-				.mappedResponse(
+				.init(
 					from: data,
 					response: response,
 					error: error)
@@ -93,7 +71,7 @@ private extension HTTPDataProvider {
 	func download(_ request: URLRequest, callback respondWith: @escaping DataProviderClosure) {
 		session.dataTask(with: request) { data, response, error in
 			respondWith(
-				.mappedResponse(
+				.init(
 					from: data,
 					response: response,
 					error: error)
