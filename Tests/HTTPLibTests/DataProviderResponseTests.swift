@@ -9,7 +9,7 @@ final class DataProviderResponseTests: XCTestCase {
 				from: nil,
 				response: nil,
 				error: MockError()),
-			.unreachable)
+			.failure(.unreachable))
 	}
 
 	func testDataProviderResponseMappedResponseNotHTTPResponse() throws {
@@ -22,9 +22,11 @@ final class DataProviderResponseTests: XCTestCase {
 					expectedContentLength: 0,
 					textEncodingName: nil),
 				error: nil),
-			.error(
-				code: nil,
-				data: "some-data".data(using: .utf8)!)
+			.failure(
+				.service(
+					code: nil,
+					data: "some-data".data(using: .utf8)!)
+			)
 		)
 	}
 
@@ -38,9 +40,11 @@ final class DataProviderResponseTests: XCTestCase {
 					httpVersion: nil,
 					headerFields: nil),
 				error: nil),
-			.error(
-				code: nil,
-				data: "some-data".data(using: .utf8)!)
+			.failure(
+				.service(
+					code: nil,
+					data: "some-data".data(using: .utf8)!)
+			)
 		)
 	}
 
@@ -54,9 +58,11 @@ final class DataProviderResponseTests: XCTestCase {
 					httpVersion: nil,
 					headerFields: nil),
 				error: nil),
-			.error(
-				code: .notFound,
-				data: "some-data".data(using: .utf8)!)
+			.failure(
+				.service(
+					code: .notFound,
+					data: "some-data".data(using: .utf8)!)
+			)
 		)
 	}
 
@@ -71,65 +77,65 @@ final class DataProviderResponseTests: XCTestCase {
 					headerFields: nil),
 				error: nil),
 			.success(
-				data: "some-data".data(using: .utf8)!)
+				"some-data".data(using: .utf8)!)
 		)
 	}
 
 	func testDataProviderResponseEquality() throws {
 		XCTAssertEqual(
-			DataProviderResponse.success(data: "test".data(using: .utf8)),
-			DataProviderResponse.success(data: "test".data(using: .utf8))
+			DataProviderResponse.success("test".data(using: .utf8)),
+			DataProviderResponse.success("test".data(using: .utf8))
 		)
 		XCTAssertEqual(
-			DataProviderResponse.success(data: nil),
-			DataProviderResponse.success(data: nil)
+			DataProviderResponse.success(nil),
+			DataProviderResponse.success(nil)
 		)
 		XCTAssertEqual(
-			DataProviderResponse.error(code: .notFound, data: "test".data(using: .utf8)),
-			DataProviderResponse.error(code: .notFound, data: "test".data(using: .utf8))
+			DataProviderResponse.failure(.service(code: .notFound, data: "test".data(using: .utf8))),
+			DataProviderResponse.failure(.service(code: .notFound, data: "test".data(using: .utf8)))
 		)
 		XCTAssertEqual(
-			DataProviderResponse.error(code: .internalServerError, data: nil),
-			DataProviderResponse.error(code: .internalServerError, data: nil)
+			DataProviderResponse.failure(.service(code: .internalServerError, data: nil)),
+			DataProviderResponse.failure(.service(code: .internalServerError, data: nil))
 		)
 		XCTAssertEqual(
-			DataProviderResponse.unreachable,
-			DataProviderResponse.unreachable
+			DataProviderResponse.failure(.unreachable),
+			DataProviderResponse.failure(.unreachable)
 		)
 
 		XCTAssertNotEqual(
-			DataProviderResponse.success(data: "test-1".data(using: .utf8)),
-			DataProviderResponse.success(data: "test-2".data(using: .utf8))
+			DataProviderResponse.success("test-1".data(using: .utf8)),
+			DataProviderResponse.success("test-2".data(using: .utf8))
 		)
 		XCTAssertNotEqual(
-			DataProviderResponse.success(data: "test-1".data(using: .utf8)),
-			DataProviderResponse.success(data: nil)
-		)
-
-		XCTAssertNotEqual(
-			DataProviderResponse.error(code: .notFound, data: "test-1".data(using: .utf8)),
-			DataProviderResponse.error(code: .notFound, data: "test-2".data(using: .utf8))
-		)
-		XCTAssertNotEqual(
-			DataProviderResponse.error(code: .notFound, data: "test-1".data(using: .utf8)),
-			DataProviderResponse.error(code: .notFound, data: nil)
-		)
-		XCTAssertNotEqual(
-			DataProviderResponse.error(code: .notFound, data: nil),
-			DataProviderResponse.error(code: .internalServerError, data: nil)
+			DataProviderResponse.success("test-1".data(using: .utf8)),
+			DataProviderResponse.success(nil)
 		)
 
 		XCTAssertNotEqual(
-			DataProviderResponse.success(data: nil),
-			DataProviderResponse.error(code: nil, data: nil)
+			DataProviderResponse.failure(.service(code: .notFound, data: "test-1".data(using: .utf8))),
+			DataProviderResponse.failure(.service(code: .notFound, data: "test-2".data(using: .utf8)))
 		)
 		XCTAssertNotEqual(
-			DataProviderResponse.success(data: nil),
-			DataProviderResponse.unreachable
+			DataProviderResponse.failure(.service(code: .notFound, data: "test-1".data(using: .utf8))),
+			DataProviderResponse.failure(.service(code: .notFound, data: nil))
 		)
 		XCTAssertNotEqual(
-			DataProviderResponse.error(code: nil, data: nil),
-			DataProviderResponse.unreachable
+			DataProviderResponse.failure(.service(code: .notFound, data: nil)),
+			DataProviderResponse.failure(.service(code: .internalServerError, data: nil))
+		)
+
+		XCTAssertNotEqual(
+			DataProviderResponse.success(nil),
+			DataProviderResponse.failure(.service(code: nil, data: nil))
+		)
+		XCTAssertNotEqual(
+			DataProviderResponse.success(nil),
+			DataProviderResponse.failure(.unreachable)
+		)
+		XCTAssertNotEqual(
+			DataProviderResponse.failure(.service(code: nil, data: nil)),
+			DataProviderResponse.failure(.unreachable)
 		)
 	}
 }

@@ -84,7 +84,7 @@ extension HTTPDataProviderTests {
 			headers: [:],
 			body: "body".data(using: .utf8)!)
 		try sut.send(request) { response in
-			XCTAssertEqual(response, .success(data: "response".data(using: .utf8)!))
+			XCTAssertEqual(response, .success("response".data(using: .utf8)!))
 			expectation.fulfill()
 		}
 
@@ -111,7 +111,7 @@ extension HTTPDataProviderTests {
 			headers: [:],
 			body: nil)
 		try sut.send(request) { response in
-			XCTAssertEqual(response, .success(data: "response".data(using: .utf8)!))
+			XCTAssertEqual(response, .success("response".data(using: .utf8)!))
 			expectation.fulfill()
 		}
 
@@ -131,7 +131,7 @@ extension HTTPDataProviderTests {
 			headers: [:],
 			body: nil)
 		try sut.send(request) { response in
-			XCTAssertEqual(response, .unreachable)
+			XCTAssertEqual(response, .failure(.unreachable))
 			expectation.fulfill()
 		}
 

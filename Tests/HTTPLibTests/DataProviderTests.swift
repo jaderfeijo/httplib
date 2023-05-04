@@ -7,7 +7,7 @@ class DataProviderTests: XCTestCase {
 	override func setUpWithError() throws {
 		try super.setUpWithError()
 		mockProvider = MockDataProvider()
-		mockProvider.getResponse = { _ in .unreachable }
+		mockProvider.getResponse = { _ in .failure(.unreachable) }
 	}
 
 	override func tearDownWithError() throws {
@@ -20,7 +20,7 @@ extension DataProviderTests {
 	@available(macOS 10.15, iOS 13.0.0, tvOS 13.0.0, watchOS 6.0, *)
 	func testSendAsyncSuccess() async throws {
 		mockProvider.getResponse = { _ in
-			.success(data: nil)
+			.success(nil)
 		}
 
 		let response = try await mockProvider.send(
@@ -31,13 +31,13 @@ extension DataProviderTests {
 				body: nil)
 		)
 
-		XCTAssertEqual(response, .success(data: nil))
+		XCTAssertEqual(response, .success(nil))
 	}
 
 	@available(macOS 10.15, iOS 13.0.0, tvOS 13.0.0, watchOS 6.0, *)
 	func testSendAsyncFailure() async throws {
 		mockProvider.getResponse = { _ in
-			.error(code: .internalServerError, data: nil)
+			.failure(.service(code: .internalServerError, data: nil))
 		}
 
 		let response = try await mockProvider.send(
@@ -48,7 +48,7 @@ extension DataProviderTests {
 				body: nil)
 		)
 
-		XCTAssertEqual(response, .error(code: .internalServerError, data: nil))
+		XCTAssertEqual(response, .failure(.service(code: .internalServerError, data: nil)))
 	}
 
 	@available(macOS 10.15, iOS 13.0.0, tvOS 13.0.0, watchOS 6.0, *)

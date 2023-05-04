@@ -1,28 +1,22 @@
 import Foundation
 import HTTPStatusCodes
 
-/// Data Provider Response.
-///
-/// - Success: Represents a successful response from the provider.
-/// - ProviderError: Represents an error from the provider.
-/// - ProviderUnreachable: Represents a reachability error with the provider.
-public enum DataProviderResponse {
-	case success(data: Data?)
-	case error(code: HTTPStatusCode?, data: Data?)
+public typealias DataProviderResponse = Result<Data?, DataProviderError>
+
+public enum DataProviderError: Swift.Error {
 	case unreachable
+	case service(code: HTTPStatusCode?, data: Data?)
 }
 
 // MARK: - Equality -
 
-extension DataProviderResponse: Equatable {
-	public static func == (left: DataProviderResponse, right: DataProviderResponse) -> Bool {
-		switch (left, right) {
-		case (.success(let leftData), .success(let rightData)):
-			return leftData == rightData
-		case (.error(let leftCode, let leftData), .error(let rightCode, let rightData)):
-			return leftCode == rightCode && leftData == rightData
+extension DataProviderError: Equatable {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		switch (lhs, rhs) {
 		case (.unreachable, .unreachable):
 			return true
+		case let (.service(lhsCode, lhsData), .service(rhsCode, rhsData)):
+			return lhsCode == rhsCode && lhsData == rhsData
 		default:
 			return false
 		}
@@ -34,17 +28,17 @@ extension DataProviderResponse: Equatable {
 extension DataProviderResponse {
 	init(from data: Data?, response: URLResponse?, error: Error?) {
 		guard error == nil else {
-			self = .unreachable; return
+			self = .failure(.unreachable); return
 		}
 		guard let httpResponse = (response as? HTTPURLResponse) else {
-			self = .error(code: nil, data: data); return
+			self = .failure(.service(code: nil, data: data)); return
 		}
 		guard let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) else {
-			self = .error(code: nil, data: data); return
+			self = .failure(.service(code: nil, data: data)); return
 		}
 		guard statusCode.isSuccess else {
-			self = .error(code: statusCode, data: data); return
+			self = .failure(.service(code: statusCode, data: data)); return
 		}
-		self = .success(data: data)
+		self = .success(data)
 	}
 }
