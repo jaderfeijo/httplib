@@ -61,6 +61,7 @@ extension HTTPDataProviderTests {
 		 which causes the code to actually hit the specified URL, bypassing the custom
 		 protocol.
 		*/
+		print("Test case 'testSendPostRequest' ignored on watchOS")
 		return
 		#endif
 
