@@ -35,10 +35,10 @@ extension HTTPDataProviderTests {
 		let expectation = expectation(description: "request completed")
 
 		do {
-			let request = DataProviderRequest(
+			let request = SimpleDataProviderRequest(
 				method: .get,
 				url: "   ",
-				headers: nil,
+				headers: [:],
 				body: nil)
 			try sut.send(request) { _ in
 				XCTFail("Expected exception to be thrown")
@@ -77,10 +77,10 @@ extension HTTPDataProviderTests {
 			)
 		}
 
-		let request = DataProviderRequest(
+		let request = SimpleDataProviderRequest(
 			method: .post,
 			url: "test",
-			headers: nil,
+			headers: [:],
 			body: "body".data(using: .utf8)!)
 		try sut.send(request) { response in
 			XCTAssertEqual(response, .success(data: "response".data(using: .utf8)!))
@@ -104,10 +104,10 @@ extension HTTPDataProviderTests {
 			)
 		}
 
-		let request = DataProviderRequest(
+		let request = SimpleDataProviderRequest(
 			method: .get,
 			url: "test",
-			headers: nil,
+			headers: [:],
 			body: nil)
 		try sut.send(request) { response in
 			XCTAssertEqual(response, .success(data: "response".data(using: .utf8)!))
@@ -124,10 +124,10 @@ extension HTTPDataProviderTests {
 			throw URLError(URLError.timedOut)
 		}
 
-		let request = DataProviderRequest(
+		let request = SimpleDataProviderRequest(
 			method: .get,
 			url: "test",
-			headers: nil,
+			headers: [:],
 			body: nil)
 		try sut.send(request) { response in
 			XCTAssertEqual(response, .unreachable)
@@ -215,7 +215,7 @@ extension HTTPDataProviderTests {
 
 extension HTTPDataProviderTests {
 	func testURLRequestFromDataProviderRequestSuccess() throws {
-		let request = DataProviderRequest(
+		let request = SimpleDataProviderRequest(
 			method: .get,
 			url: "http://test/test",
 			headers: ["key": "value"],
@@ -230,7 +230,7 @@ extension HTTPDataProviderTests {
 	}
 
 	func testURLRequestFromDataProviderRequestInvalidURL() throws {
-		let request = DataProviderRequest(
+		let request = SimpleDataProviderRequest(
 			method: .get,
 			url: "   ", // invalid url
 			headers: ["key": "value"],

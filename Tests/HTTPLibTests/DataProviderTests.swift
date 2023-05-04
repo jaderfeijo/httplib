@@ -24,10 +24,10 @@ extension DataProviderTests {
 		}
 
 		let response = try await mockProvider.send(
-			.init(
+			SimpleDataProviderRequest(
 				method: .get,
 				url: "http://test/test",
-				headers: nil,
+				headers: [:],
 				body: nil)
 		)
 
@@ -41,10 +41,10 @@ extension DataProviderTests {
 		}
 
 		let response = try await mockProvider.send(
-			.init(
+			SimpleDataProviderRequest(
 				method: .get,
 				url: "http://test/test",
-				headers: nil,
+				headers: [:],
 				body: nil)
 		)
 
@@ -61,10 +61,10 @@ extension DataProviderTests {
 
 		do {
 			_ = try await mockProvider.send(
-				.init(
+				SimpleDataProviderRequest(
 					method: .get,
 					url: "http://test/test",
-					headers: nil,
+					headers: [:],
 					body: nil)
 			)
 			XCTFail("Expected exception to be thrown")
@@ -76,19 +76,19 @@ extension DataProviderTests {
 
 extension DataProviderTests {
 	func testDataProviderRequestEquality() throws {
-		let firstRequest = DataProviderRequest(
+		let firstRequest = SimpleDataProviderRequest(
 			method: .get,
 			url: "test",
 			headers: ["test":"value"],
 			body: "test".data(using: .utf8)
 		)
-		let secondRequest = DataProviderRequest(
+		let secondRequest = SimpleDataProviderRequest(
 			method: .get,
 			url: "test",
 			headers: ["test":"value"],
 			body: "test".data(using: .utf8)
 		)
-		let thirdRequest = DataProviderRequest(
+		let thirdRequest = SimpleDataProviderRequest(
 			method: .post,
 			url: "another-test",
 			headers: ["another-test":"another-value"],
@@ -163,11 +163,11 @@ extension DataProviderTests {
 
 extension DataProviderTests {
 	class MockDataProvider: DataProvider {
-		typealias ResponseProvider = (DataProviderRequest) throws -> DataProviderResponse
+		typealias ResponseProvider = (any DataProviderRequest) throws -> DataProviderResponse
 
 		var getResponse: ResponseProvider!
 
-		func send(_ request: DataProviderRequest, callback: @escaping DataProviderClosure) throws {
+		func send(_ request: any DataProviderRequest, callback: @escaping DataProviderClosure) throws {
 			callback(try getResponse(request))
 		}
 	}

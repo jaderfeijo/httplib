@@ -17,7 +17,7 @@ public class HTTPDataProvider {
 }
 
 extension HTTPDataProvider: DataProvider {
-	public func send(_ request: DataProviderRequest, callback: @escaping DataProviderClosure) throws {
+	public func send(_ request: any DataProviderRequest, callback: @escaping DataProviderClosure) throws {
 		let httpRequest = try URLRequest.from(
 			request: request)
 
@@ -63,7 +63,7 @@ extension URLRequest {
 		let url: String
 	}
 
-	static func from(request: DataProviderRequest) throws -> URLRequest {
+	static func from(request: any DataProviderRequest) throws -> URLRequest {
 		guard let url = URL(string: request.url) else {
 			throw InvalidURLError(url: request.url)
 		}
