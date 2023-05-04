@@ -1,5 +1,6 @@
 import Foundation
 import HTTPStatusCodes
+import HTTPMethod
 
 #if canImport(FoundationNetworking)
 import FoundationNetworking
@@ -71,19 +72,6 @@ public extension DataProvider {
 			}
 		}
 	}
-}
-
-/// The HTTP method to use for a given request.
-public enum HTTPMethod: String {
-	case get = "GET"
-	case head = "HEAD"
-	case post = "POST"
-	case put = "PUT"
-	case delete = "DELETE"
-	case trace = "TRACE"
-	case options = "OPTIONS"
-	case connect = "CONNECT"
-	case patch = "PATCH"
 }
 
 // MARK: - Equality -
