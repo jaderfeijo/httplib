@@ -1,13 +1,8 @@
 import Foundation
-import HTTPStatusCodes
-import HTTPMethod
 
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
-
-/// A closure that passes a response to a sent request.
-public typealias DataProviderClosure = (DataProviderResponse) -> Void
 
 /// DataProvider protocol which allows data fetching logic
 /// to be decoupled from the API instance. This is useful
@@ -22,8 +17,10 @@ public protocol DataProvider {
 	///   from the provider.
 	/// - parameter callback: The callback called once the request completes
 	///   executing the request.
-	func send(_ request: any DataProviderRequest, callback: @escaping DataProviderClosure) throws
+	func send<T: Decodable>(_ request: any DataProviderRequest, callback: @escaping DataProviderClosure<T>) throws
 }
+
+// MARK - Async Support -
 
 public extension DataProvider {
 	/// Sends the specified request to the provider.
@@ -31,11 +28,16 @@ public extension DataProvider {
 	///   from the provider.
 	/// - Returns:The data provider's response.
 	@available(macOS 10.15, iOS 13.0.0, tvOS 13.0.0, watchOS 6.0, *)
-	func send(_ request: any DataProviderRequest) async throws -> DataProviderResponse {
+	func send<T: Decodable>(_ request: any DataProviderRequest) async throws -> T {
 		try await withCheckedThrowingContinuation { continuation in
 			do {
-				try send(request) { response in
-					continuation.resume(returning: response)
+				try send(request) { (result: DataProviderResponse<T>) in
+					switch result {
+					case .success(let response):
+						continuation.resume(returning: response)
+					case .failure(let error):
+						continuation.resume(throwing: error)
+					}
 				}
 			} catch {
 				continuation.resume(throwing: error)

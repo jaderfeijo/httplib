@@ -1,44 +1,11 @@
 import Foundation
-import HTTPStatusCodes
 
-public typealias DataProviderResponse = Result<Data?, DataProviderError>
+/// A data provider response, which encapsulates a generic type
+/// representing the returned value.
+public typealias DataProviderResponse<T: Decodable> = Result<T, DataProviderError>
 
-public enum DataProviderError: Swift.Error {
-	case unreachable
-	case service(code: HTTPStatusCode?, data: Data?)
-}
+/// A closure that passes a response to a sent request.
+public typealias DataProviderClosure<T: Decodable> = (DataProviderResponse<T>) -> Void
 
-// MARK: - Equality -
-
-extension DataProviderError: Equatable {
-	public static func == (lhs: Self, rhs: Self) -> Bool {
-		switch (lhs, rhs) {
-		case (.unreachable, .unreachable):
-			return true
-		case let (.service(lhsCode, lhsData), .service(rhsCode, rhsData)):
-			return lhsCode == rhsCode && lhsData == rhsData
-		default:
-			return false
-		}
-	}
-}
-
-// MARK: - Internal -
-
-extension DataProviderResponse {
-	init(from data: Data?, response: URLResponse?, error: Error?) {
-		guard error == nil else {
-			self = .failure(.unreachable); return
-		}
-		guard let httpResponse = (response as? HTTPURLResponse) else {
-			self = .failure(.service(code: nil, data: data)); return
-		}
-		guard let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) else {
-			self = .failure(.service(code: nil, data: data)); return
-		}
-		guard statusCode.isSuccess else {
-			self = .failure(.service(code: statusCode, data: data)); return
-		}
-		self = .success(data)
-	}
-}
+/// An Empty decodable structure for requests which do not return any data.
+public struct Empty: Decodable {}
