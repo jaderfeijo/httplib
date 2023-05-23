@@ -44,4 +44,12 @@ public extension DataProvider {
 			}
 		}
 	}
+
+	/// Sends the specified request to the provider.
+	/// - Parameter request: The request used to send/retrieve the data
+	///   from the provider.
+	@available(macOS 10.15, iOS 13.0.0, tvOS 13.0.0, watchOS 6.0, *)
+	func send(_ request: any DataProviderRequest) async throws {
+		let _: Empty = try await send(request)
+	}
 }

@@ -41,9 +41,6 @@ extension HTTPDataProvider: DataProvider {
 
 // MARK: - Internal -
 
-/// A HTTP response provided by URLSession
-typealias HTTPResponse = (data: Data?, response: URLResponse?, error: Error?)
-
 extension URLRequest {
 	struct InvalidURLError: Swift.Error {
 		let url: String
@@ -70,7 +67,7 @@ private extension HTTPDataProvider {
 			guard let self = self else { return }
 			respondWith(
 				.parse(
-					from: (data: data, response: response, error: error),
+					from: .init(data: data, response: response, error: error),
 					using: self.decoder
 				)
 			)
@@ -82,39 +79,10 @@ private extension HTTPDataProvider {
 			guard let self = self else { return }
 			respondWith(
 				.parse(
-					from: (data: data, response: response, error: error),
+					from: .init(data: data, response: response, error: error),
 					using: self.decoder
 				)
 			)
 		}.resume()
-	}
-}
-
-private extension Result where Success: Decodable, Failure == DataProviderError {
-	static func parse(from response: HTTPResponse, using decoder: JSONDecoder) -> Self {
-		guard response.error == nil else {
-			#warning("TODO: Improve mapping of Foundation errors. They might not be all reachability related")
-			return .failure(.unreachable)
-		}
-		guard let httpResponse = (response.response as? HTTPURLResponse) else {
-			return .failure(.service(code: nil, data: response.data))
-		}
-		guard let statusCode = HTTPStatusCode(rawValue: httpResponse.statusCode) else {
-			return .failure(.service(code: nil, data: response.data))
-		}
-		guard statusCode.isSuccess else {
-			return .failure(.service(code: statusCode, data: response.data))
-		}
-
-		do {
-			let parsedData = try decoder.decode(
-				Success.self,
-				from: response.data ?? Data())
-			return .success(parsedData)
-		} catch let error as DecodingError {
-			return .failure(.parsing(error))
-		} catch {
-			return .failure(.unknown(error))
-		}
 	}
 }

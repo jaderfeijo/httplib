@@ -17,6 +17,10 @@ extension DataProviderError: Equatable {
 			return true
 		case let (.service(lhsCode, lhsData), .service(rhsCode, rhsData)):
 			return lhsCode == rhsCode && lhsData == rhsData
+		case (.parsing, .parsing):
+			return true
+		case (.unknown, .unknown):
+			return true
 		default:
 			return false
 		}

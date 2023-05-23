@@ -40,7 +40,7 @@ extension HTTPDataProviderTests {
 				url: "   ",
 				headers: [:],
 				body: nil)
-			try sut.send(request) { _ in
+			try sut.send<Empty>(request) { (_: DataProviderResponse<Empty>) in
 				XCTFail("Expected exception to be thrown")
 			}
 		} catch {
@@ -74,7 +74,7 @@ extension HTTPDataProviderTests {
 					statusCode: 200,
 					httpVersion: nil,
 					headerFields: nil)!,
-				"response".data(using: .utf8)!
+				"{\"response\":\"value\"}".data(using: .utf8)!
 			)
 		}
 
@@ -84,7 +84,7 @@ extension HTTPDataProviderTests {
 			headers: [:],
 			body: "body".data(using: .utf8)!)
 		try sut.send(request) { response in
-			XCTAssertEqual(response, .success("response".data(using: .utf8)!))
+			XCTAssertEqual(response, .success(MockResponse(response: "value")))
 			expectation.fulfill()
 		}
 
@@ -101,7 +101,7 @@ extension HTTPDataProviderTests {
 					statusCode: 200,
 					httpVersion: nil,
 					headerFields: nil)!,
-				"response".data(using: .utf8)!
+				"{\"response\":\"value\"}".data(using: .utf8)!
 			)
 		}
 
@@ -111,7 +111,7 @@ extension HTTPDataProviderTests {
 			headers: [:],
 			body: nil)
 		try sut.send(request) { response in
-			XCTAssertEqual(response, .success("response".data(using: .utf8)!))
+			XCTAssertEqual(response, .success(MockResponse(response: "value")))
 			expectation.fulfill()
 		}
 
@@ -130,7 +130,7 @@ extension HTTPDataProviderTests {
 			url: "test",
 			headers: [:],
 			body: nil)
-		try sut.send(request) { response in
+		try sut.send<Empty>(request) { (response: DataProviderResponse<Empty>) in
 			XCTAssertEqual(response, .failure(.unreachable))
 			expectation.fulfill()
 		}
@@ -174,6 +174,12 @@ extension HTTPDataProviderTests {
 }
 
 // MARK: - Private -
+
+private extension HTTPDataProviderTests {
+	struct MockResponse: Decodable, Equatable {
+		let response: String
+	}
+}
 
 private extension HTTPDataProviderTests {
 	class MockURLProtocol: URLProtocol {

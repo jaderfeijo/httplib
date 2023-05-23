@@ -5,23 +5,29 @@ final class DataProviderResponseTests: XCTestCase {
 	func testDataProviderResponseMappedResponseError() throws {
 		struct MockError: Swift.Error { }
 		XCTAssertEqual(
-			DataProviderResponse(
-				from: nil,
-				response: nil,
-				error: MockError()),
+			DataProviderResponse<Empty>.parse(
+				from: .init(
+					data: nil,
+					response: nil,
+					error: MockError()),
+				using: .init()
+			),
 			.failure(.unreachable))
 	}
 
 	func testDataProviderResponseMappedResponseNotHTTPResponse() throws {
 		XCTAssertEqual(
-			DataProviderResponse(
-				from: "some-data".data(using: .utf8)!,
-				response: URLResponse(
-					url: .init(string: "test-url")!,
-					mimeType: nil,
-					expectedContentLength: 0,
-					textEncodingName: nil),
-				error: nil),
+			DataProviderResponse<Empty>.parse(
+				from: .init(
+					data: "some-data".data(using: .utf8)!,
+					response: URLResponse(
+						url: .init(string: "test-url")!,
+						mimeType: nil,
+						expectedContentLength: 0,
+						textEncodingName: nil),
+					error: nil),
+				using: .init()
+			),
 			.failure(
 				.service(
 					code: nil,
@@ -32,14 +38,17 @@ final class DataProviderResponseTests: XCTestCase {
 
 	func testDataProviderResponseMappedResponseHTTPErrorNoStatusCode() throws {
 		XCTAssertEqual(
-			DataProviderResponse(
-				from: "some-data".data(using: .utf8)!,
-				response: HTTPURLResponse(
-					url: .init(string: "test-url")!,
-					statusCode: 0,
-					httpVersion: nil,
-					headerFields: nil),
-				error: nil),
+			DataProviderResponse<Empty>.parse(
+				from: .init(
+					data: "some-data".data(using: .utf8)!,
+					response: HTTPURLResponse(
+						url: .init(string: "test-url")!,
+						statusCode: 0,
+						httpVersion: nil,
+						headerFields: nil),
+					error: nil),
+				using: .init()
+			),
 			.failure(
 				.service(
 					code: nil,
@@ -50,14 +59,17 @@ final class DataProviderResponseTests: XCTestCase {
 
 	func testDataProviderResponseMappedResponseHTTPError() throws {
 		XCTAssertEqual(
-			DataProviderResponse(
-				from: "some-data".data(using: .utf8)!,
-				response: HTTPURLResponse(
-					url: .init(string: "test-url")!,
-					statusCode: 404,
-					httpVersion: nil,
-					headerFields: nil),
-				error: nil),
+			DataProviderResponse<Empty>.parse(
+				from: .init(
+					data: "some-data".data(using: .utf8)!,
+					response: HTTPURLResponse(
+						url: .init(string: "test-url")!,
+						statusCode: 404,
+						httpVersion: nil,
+						headerFields: nil),
+					error: nil),
+				using: .init()
+			),
 			.failure(
 				.service(
 					code: .notFound,
@@ -68,39 +80,41 @@ final class DataProviderResponseTests: XCTestCase {
 
 	func testDataProviderResponseMappedResponseSuccess() throws {
 		XCTAssertEqual(
-			DataProviderResponse(
-				from: "some-data".data(using: .utf8)!,
-				response: HTTPURLResponse(
-					url: .init(string: "test-url")!,
-					statusCode: 200,
-					httpVersion: nil,
-					headerFields: nil),
-				error: nil),
-			.success(
-				"some-data".data(using: .utf8)!)
+			DataProviderResponse<Mock>.parse(
+				from: .init(
+					data: "{\"value\":\"Value\"}".data(using: .utf8)!,
+					response: HTTPURLResponse(
+						url: .init(string: "test-url")!,
+						statusCode: 200,
+						httpVersion: nil,
+						headerFields: nil),
+					error: nil),
+				using: .init()
+			),
+			.success(Mock(value: "Value"))
 		)
 	}
 
 	func testDataProviderResponseEquality() throws {
 		XCTAssertEqual(
-			DataProviderResponse.success("test".data(using: .utf8)),
-			DataProviderResponse.success("test".data(using: .utf8))
+			DataProviderResponse.success(Mock(value: "Value")),
+			DataProviderResponse.success(Mock(value: "Value"))
 		)
 		XCTAssertEqual(
-			DataProviderResponse.success(nil),
-			DataProviderResponse.success(nil)
+			DataProviderResponse<Empty>.success(.empty),
+			DataProviderResponse<Empty>.success(.empty)
 		)
 		XCTAssertEqual(
-			DataProviderResponse.failure(.service(code: .notFound, data: "test".data(using: .utf8))),
-			DataProviderResponse.failure(.service(code: .notFound, data: "test".data(using: .utf8)))
+			DataProviderResponse<Empty>.failure(.service(code: .notFound, data: "test".data(using: .utf8))),
+			DataProviderResponse<Empty>.failure(.service(code: .notFound, data: "test".data(using: .utf8)))
 		)
 		XCTAssertEqual(
-			DataProviderResponse.failure(.service(code: .internalServerError, data: nil)),
-			DataProviderResponse.failure(.service(code: .internalServerError, data: nil))
+			DataProviderResponse<Empty>.failure(.service(code: .internalServerError, data: nil)),
+			DataProviderResponse<Empty>.failure(.service(code: .internalServerError, data: nil))
 		)
 		XCTAssertEqual(
-			DataProviderResponse.failure(.unreachable),
-			DataProviderResponse.failure(.unreachable)
+			DataProviderResponse<Empty>.failure(.unreachable),
+			DataProviderResponse<Empty>.failure(.unreachable)
 		)
 
 		XCTAssertNotEqual(
@@ -113,29 +127,37 @@ final class DataProviderResponseTests: XCTestCase {
 		)
 
 		XCTAssertNotEqual(
-			DataProviderResponse.failure(.service(code: .notFound, data: "test-1".data(using: .utf8))),
-			DataProviderResponse.failure(.service(code: .notFound, data: "test-2".data(using: .utf8)))
+			DataProviderResponse<Empty>.failure(.service(code: .notFound, data: "test-1".data(using: .utf8))),
+			DataProviderResponse<Empty>.failure(.service(code: .notFound, data: "test-2".data(using: .utf8)))
 		)
 		XCTAssertNotEqual(
-			DataProviderResponse.failure(.service(code: .notFound, data: "test-1".data(using: .utf8))),
-			DataProviderResponse.failure(.service(code: .notFound, data: nil))
+			DataProviderResponse<Empty>.failure(.service(code: .notFound, data: "test-1".data(using: .utf8))),
+			DataProviderResponse<Empty>.failure(.service(code: .notFound, data: nil))
 		)
 		XCTAssertNotEqual(
-			DataProviderResponse.failure(.service(code: .notFound, data: nil)),
-			DataProviderResponse.failure(.service(code: .internalServerError, data: nil))
+			DataProviderResponse<Empty>.failure(.service(code: .notFound, data: nil)),
+			DataProviderResponse<Empty>.failure(.service(code: .internalServerError, data: nil))
 		)
 
 		XCTAssertNotEqual(
-			DataProviderResponse.success(nil),
-			DataProviderResponse.failure(.service(code: nil, data: nil))
+			DataProviderResponse<Empty>.success(.empty),
+			DataProviderResponse<Empty>.failure(.service(code: nil, data: nil))
 		)
 		XCTAssertNotEqual(
-			DataProviderResponse.success(nil),
-			DataProviderResponse.failure(.unreachable)
+			DataProviderResponse<Empty>.success(.empty),
+			DataProviderResponse<Empty>.failure(.unreachable)
 		)
 		XCTAssertNotEqual(
-			DataProviderResponse.failure(.service(code: nil, data: nil)),
-			DataProviderResponse.failure(.unreachable)
+			DataProviderResponse<Empty>.failure(.service(code: nil, data: nil)),
+			DataProviderResponse<Empty>.failure(.unreachable)
 		)
+	}
+}
+
+// MARK: - Private -
+
+extension DataProviderResponseTests {
+	struct Mock: Decodable, Equatable {
+		let value: String
 	}
 }
