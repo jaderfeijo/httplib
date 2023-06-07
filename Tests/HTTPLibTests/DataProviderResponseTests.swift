@@ -1,6 +1,10 @@
 import XCTest
 @testable import HTTPLib
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 final class DataProviderResponseTests: XCTestCase {
 	func testDataProviderResponseMappedResponseError() throws {
 		struct MockError: Swift.Error { }

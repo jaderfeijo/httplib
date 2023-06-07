@@ -1,6 +1,10 @@
 import Foundation
 import HTTPStatusCodes
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 /// A data provider response, which encapsulates a generic type
 /// representing the returned value.
 public typealias DataProviderResponse<T: Decodable> = Result<T, DataProviderError>
