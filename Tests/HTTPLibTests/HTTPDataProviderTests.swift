@@ -35,12 +35,12 @@ extension HTTPDataProviderTests {
 		let expectation = expectation(description: "request completed")
 
 		do {
-			let request = DataProviderRequest(
+			let request = RawDataProviderRequest(
 				method: .get,
 				url: "   ",
-				headers: nil,
+				headers: [:],
 				body: nil)
-			try sut.send(request) { _ in
+			try sut.send<Empty>(request) { (_: DataProviderResponse<Empty>) in
 				XCTFail("Expected exception to be thrown")
 			}
 		} catch {
@@ -61,6 +61,7 @@ extension HTTPDataProviderTests {
 		 which causes the code to actually hit the specified URL, bypassing the custom
 		 protocol.
 		*/
+		print("Test case 'testSendPostRequest' ignored on watchOS")
 		return
 		#endif
 
@@ -73,17 +74,17 @@ extension HTTPDataProviderTests {
 					statusCode: 200,
 					httpVersion: nil,
 					headerFields: nil)!,
-				"response".data(using: .utf8)!
+				"{\"response\":\"value\"}".data(using: .utf8)!
 			)
 		}
 
-		let request = DataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .post,
 			url: "test",
-			headers: nil,
+			headers: [:],
 			body: "body".data(using: .utf8)!)
 		try sut.send(request) { response in
-			XCTAssertEqual(response, .success(data: "response".data(using: .utf8)!))
+			XCTAssertEqual(response, .success(MockResponse(response: "value")))
 			expectation.fulfill()
 		}
 
@@ -100,17 +101,17 @@ extension HTTPDataProviderTests {
 					statusCode: 200,
 					httpVersion: nil,
 					headerFields: nil)!,
-				"response".data(using: .utf8)!
+				"{\"response\":\"value\"}".data(using: .utf8)!
 			)
 		}
 
-		let request = DataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .get,
 			url: "test",
-			headers: nil,
+			headers: [:],
 			body: nil)
 		try sut.send(request) { response in
-			XCTAssertEqual(response, .success(data: "response".data(using: .utf8)!))
+			XCTAssertEqual(response, .success(MockResponse(response: "value")))
 			expectation.fulfill()
 		}
 
@@ -124,13 +125,13 @@ extension HTTPDataProviderTests {
 			throw URLError(URLError.timedOut)
 		}
 
-		let request = DataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .get,
 			url: "test",
-			headers: nil,
+			headers: [:],
 			body: nil)
-		try sut.send(request) { response in
-			XCTAssertEqual(response, .unreachable)
+		try sut.send<Empty>(request) { (response: DataProviderResponse<Empty>) in
+			XCTAssertEqual(response, .failure(.unreachable))
 			expectation.fulfill()
 		}
 
@@ -139,83 +140,8 @@ extension HTTPDataProviderTests {
 }
 
 extension HTTPDataProviderTests {
-	func testDataProviderResponseMappedResponseError() throws {
-		struct MockError: Swift.Error { }
-		XCTAssertEqual(
-			DataProviderResponse.mappedResponse(
-				from: nil,
-				response: nil,
-				error: MockError()),
-			.unreachable)
-	}
-
-	func testDataProviderResponseMappedResponseNotHTTPResponse() throws {
-		XCTAssertEqual(
-			DataProviderResponse.mappedResponse(
-				from: "some-data".data(using: .utf8)!,
-				response: URLResponse(
-					url: .init(string: "test-url")!,
-					mimeType: nil,
-					expectedContentLength: 0,
-					textEncodingName: nil),
-				error: nil),
-			.error(
-				code: nil,
-				data: "some-data".data(using: .utf8)!)
-		)
-	}
-
-	func testDataProviderResponseMappedResponseHTTPErrorNoStatusCode() throws {
-		XCTAssertEqual(
-			DataProviderResponse.mappedResponse(
-				from: "some-data".data(using: .utf8)!,
-				response: HTTPURLResponse(
-					url: .init(string: "test-url")!,
-					statusCode: 0,
-					httpVersion: nil,
-					headerFields: nil),
-				error: nil),
-			.error(
-				code: nil,
-				data: "some-data".data(using: .utf8)!)
-		)
-	}
-
-	func testDataProviderResponseMappedResponseHTTPError() throws {
-		XCTAssertEqual(
-			DataProviderResponse.mappedResponse(
-				from: "some-data".data(using: .utf8)!,
-				response: HTTPURLResponse(
-					url: .init(string: "test-url")!,
-					statusCode: 404,
-					httpVersion: nil,
-					headerFields: nil),
-				error: nil),
-			.error(
-				code: .notFound,
-				data: "some-data".data(using: .utf8)!)
-		)
-	}
-
-	func testDataProviderResponseMappedResponseSuccess() throws {
-		XCTAssertEqual(
-			DataProviderResponse.mappedResponse(
-				from: "some-data".data(using: .utf8)!,
-				response: HTTPURLResponse(
-					url: .init(string: "test-url")!,
-					statusCode: 200,
-					httpVersion: nil,
-					headerFields: nil),
-				error: nil),
-			.success(
-				data: "some-data".data(using: .utf8)!)
-		)
-	}
-}
-
-extension HTTPDataProviderTests {
 	func testURLRequestFromDataProviderRequestSuccess() throws {
-		let request = DataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .get,
 			url: "http://test/test",
 			headers: ["key": "value"],
@@ -230,7 +156,7 @@ extension HTTPDataProviderTests {
 	}
 
 	func testURLRequestFromDataProviderRequestInvalidURL() throws {
-		let request = DataProviderRequest(
+		let request = RawDataProviderRequest(
 			method: .get,
 			url: "   ", // invalid url
 			headers: ["key": "value"],
@@ -248,6 +174,12 @@ extension HTTPDataProviderTests {
 }
 
 // MARK: - Private -
+
+private extension HTTPDataProviderTests {
+	struct MockResponse: Decodable, Equatable {
+		let response: String
+	}
+}
 
 private extension HTTPDataProviderTests {
 	class MockURLProtocol: URLProtocol {

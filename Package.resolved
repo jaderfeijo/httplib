@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "HTTPMethod",
+        "repositoryURL": "https://github.com/thii/HTTPMethod.git",
+        "state": {
+          "branch": null,
+          "revision": "5cb356f4cdd00f1c79f52250f697a4007be22d55",
+          "version": "0.1.0"
+        }
+      },
+      {
         "package": "HTTPStatusCodes",
         "repositoryURL": "https://github.com/jaderfeijo/SwiftHTTPStatusCodes.git",
         "state": {

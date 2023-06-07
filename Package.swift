@@ -18,7 +18,10 @@ let package = Package(
 	dependencies: [
 		.package(
 			url: "https://github.com/jaderfeijo/SwiftHTTPStatusCodes.git",
-			.upToNextMajor(from: "3.4.0"))
+			.upToNextMajor(from: "3.4.0")),
+		.package(
+			url: "https://github.com/thii/HTTPMethod.git",
+			.upToNextMajor(from: "0.1.0"))
 	],
 	targets: [
 		.target(
@@ -26,7 +29,10 @@ let package = Package(
 			dependencies: [
 				.product(
 					name: "HTTPStatusCodes",
-					package: "SwiftHTTPStatusCodes")
+					package: "SwiftHTTPStatusCodes"),
+				.product(
+					name: "HTTPMethod",
+					package: "HTTPMethod")
 			]
 		),
 		.testTarget(
