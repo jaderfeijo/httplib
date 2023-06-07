@@ -55,16 +55,16 @@ do {
 	print("Response: \(response)")
 } catch {
 	switch error {
-    case .unreachable:
-        print("Error: Unable to reach the data provider.")
-    case .service(let code, let data):
-        print("Error: Service error with status code \(code.rawValue).")
-        print("Response data: \(data)")
-    case .parsing(let decodingError):
-        print("Error: Failed to decode data. Decoding error: \(decodingError)")
-    case .unknown(let underlyingError):
-        print("Error: Unknown error occurred. Underlying error: \(underlyingError)")
-    }
+	case .unreachable:
+		print("Error: Unable to reach the data provider.")
+	case .service(let code, let data):
+		print("Error: Service error with status code \(code.rawValue).")
+		print("Response data: \(data)")
+	case .parsing(let decodingError):
+		print("Error: Failed to decode data. Decoding error: \(decodingError)")
+	case .unknown(let underlyingError):
+		print("Error: Unknown error occurred. Underlying error: \(underlyingError)")
+	}
 }
 ```
 
