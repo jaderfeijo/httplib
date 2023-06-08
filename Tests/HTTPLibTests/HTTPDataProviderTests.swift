@@ -31,25 +31,6 @@ class HTTPDataProviderTests: XCTestCase {
 }
 
 extension HTTPDataProviderTests {
-	func testSendInvalidRequest() throws {
-		let expectation = expectation(description: "request completed")
-
-		do {
-			let request = RawDataProviderRequest(
-				method: .get,
-				url: "   ",
-				headers: [:],
-				body: nil)
-			try sut.send<Empty>(request) { (_: DataProviderResponse<Empty>) in
-				XCTFail("Expected exception to be thrown")
-			}
-		} catch {
-			expectation.fulfill()
-		}
-
-		waitForExpectations(timeout: 1.0)
-	}
-
 	func testSendPostRequest() throws {
 		#if os(watchOS)
 		/*
@@ -80,7 +61,7 @@ extension HTTPDataProviderTests {
 
 		let request = RawDataProviderRequest(
 			method: .post,
-			url: "test",
+			url: URL(string: "mock://test")!,
 			headers: [:],
 			body: "body".data(using: .utf8)!)
 		try sut.send(request) { response in
@@ -107,7 +88,7 @@ extension HTTPDataProviderTests {
 
 		let request = RawDataProviderRequest(
 			method: .get,
-			url: "test",
+			url: URL(string: "mock://test")!,
 			headers: [:],
 			body: nil)
 		try sut.send(request) { response in
@@ -127,7 +108,7 @@ extension HTTPDataProviderTests {
 
 		let request = RawDataProviderRequest(
 			method: .get,
-			url: "test",
+			url: URL(string: "mock://test")!,
 			headers: [:],
 			body: nil)
 		try sut.send<Empty>(request) { (response: DataProviderResponse<Empty>) in
@@ -143,7 +124,7 @@ extension HTTPDataProviderTests {
 	func testURLRequestFromDataProviderRequestSuccess() throws {
 		let request = RawDataProviderRequest(
 			method: .get,
-			url: "http://test/test",
+			url: URL(string: "http://test/test")!,
 			headers: ["key": "value"],
 			body: "test".data(using: .utf8)!)
 		let urlRequest = try URLRequest.from(
@@ -153,23 +134,6 @@ extension HTTPDataProviderTests {
 		XCTAssertEqual(urlRequest.url, URL(string: "http://test/test")!)
 		XCTAssertEqual(urlRequest.allHTTPHeaderFields, ["key": "value"])
 		XCTAssertEqual(urlRequest.httpBody, "test".data(using: .utf8)!)
-	}
-
-	func testURLRequestFromDataProviderRequestInvalidURL() throws {
-		let request = RawDataProviderRequest(
-			method: .get,
-			url: "   ", // invalid url
-			headers: ["key": "value"],
-			body: "test".data(using: .utf8)!)
-
-		do {
-			_ = try URLRequest.from(
-				request: request)
-			XCTFail("Expected exception to be thrown")
-		} catch {
-			XCTAssert(error is URLRequest.InvalidURLError)
-			XCTAssertEqual((error as? URLRequest.InvalidURLError)?.url, "   ")
-		}
 	}
 }
 

@@ -7,13 +7,13 @@ import HTTPMethod
  */
 public struct RawDataProviderRequest: DataProviderRequest {
 	public let method: HTTPMethod
-	public let url: String
+	public let url: URL
 	public let headers: [String: String]
 	public let body: Data?
 
 	public init(
 		method: HTTPMethod,
-		url: String,
+		url: URL,
 		headers: [String: String] = [:],
 		body: Data? = nil) {
 

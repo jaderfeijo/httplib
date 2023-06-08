@@ -4,7 +4,7 @@ import HTTPMethod
 /// A request sent to a `DataProvider`, with an encoded body.
 public struct EncodableDataProviderRequest<T: Encodable>: DataProviderRequest {
 	public let method: HTTPMethod
-	public let url: String
+	public let url: URL
 	public let headers: [String: String]
 	public let body: Data?
 
@@ -24,7 +24,7 @@ public struct EncodableDataProviderRequest<T: Encodable>: DataProviderRequest {
 	 */
 	public init(
 		method: HTTPMethod,
-		url: String,
+		url: URL,
 		headers: [String: String] = [:],
 		body: T,
 		encoder: JSONEncoder = .init()) throws {

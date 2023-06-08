@@ -42,16 +42,8 @@ extension HTTPDataProvider: DataProvider {
 // MARK: - Internal -
 
 extension URLRequest {
-	struct InvalidURLError: Swift.Error {
-		let url: String
-	}
-
 	static func from(request: any DataProviderRequest) throws -> URLRequest {
-		guard let url = URL(string: request.url) else {
-			throw InvalidURLError(url: request.url)
-		}
-
-		let urlRequest = NSMutableURLRequest(url: url)
+		let urlRequest = NSMutableURLRequest(url: request.url)
 		urlRequest.httpMethod = request.method.rawValue
 		urlRequest.allHTTPHeaderFields = request.headers
 		urlRequest.httpBody = request.body

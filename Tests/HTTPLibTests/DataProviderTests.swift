@@ -28,7 +28,7 @@ extension DataProviderTests {
 		let response: Empty = try await mockProvider.send(
 			RawDataProviderRequest(
 				method: .get,
-				url: "http://test/test",
+				url: URL(string: "http://test/test")!,
 				headers: [:],
 				body: nil)
 		)
@@ -46,7 +46,7 @@ extension DataProviderTests {
 			try await mockProvider.send<Empty>(
 				RawDataProviderRequest(
 					method: .get,
-					url: "http://test/test",
+					url: URL(string: "http://test/test")!,
 					headers: [:],
 					body: nil)
 			),
@@ -66,7 +66,7 @@ extension DataProviderTests {
 			_ = try await mockProvider.send(
 				RawDataProviderRequest(
 					method: .get,
-					url: "http://test/test",
+					url: URL(string: "http://test/test")!,
 					headers: [:],
 					body: nil)
 			)
