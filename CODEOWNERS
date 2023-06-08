@@ -1,0 +1,5 @@
+# This is a CODEOWNERS file
+# It specifies the owners of different files or directories in a repository
+
+# Ownership for the entire repository
+* @jaderfeijo
