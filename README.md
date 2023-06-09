@@ -2,6 +2,10 @@
 
 HTTPLib is a Swift library that provides a flexible and modular approach to data fetching via HTTP. It aims to simplify the process of working with HTTP requests and responses, while also offering native support for JSON Codable serialization.
 
+## Overview
+
+![](res/request-mapping.svg)
+
 ## Key Features
 
 - **DataProvider Protocol**: The library introduces the `DataProvider` protocol, allowing you to decouple data fetching logic from your API instances. This enables easy mocking of results and enhances testability without relying on external libraries.
